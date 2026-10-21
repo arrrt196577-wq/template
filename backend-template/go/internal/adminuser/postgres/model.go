@@ -1,4 +1,4 @@
-// Package postgres contains the PostgreSQL persistence model for users.
+// Package postgres contains the PostgreSQL persistence model for admin accounts.
 package postgres
 
 import "time"

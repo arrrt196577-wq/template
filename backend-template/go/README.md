@@ -32,16 +32,16 @@ go/
 │   ├── migration/              # goose Provider
 │   └── transaction/            # 显式事务回调
 ├── internal/security/          # 仅包说明，尚无密码或 Token 实现
-├── internal/user/postgres/      # 管理用户持久化实体，尚无 Repository 或业务表
+├── internal/adminuser/postgres/ # 管理用户持久化实体，尚无 Repository 或业务表
 ├── internal/member/postgres/    # 完整会员持久化实体，尚无会员业务或业务表
-├── internal/auth,user,role,…/   # 业务根包仅包说明，不预建业务类型和空接口
+├── internal/auth,adminuser,role,…/ # 业务根包仅包说明，不预建业务类型和空接口
 ├── migrations/sql/             # 嵌入式迁移资源，当前只有说明文件
 ├── tests/integration/          # PostgreSQL 隔离 schema 测试
 ├── scripts/check.ps1
 └── scripts/check.sh
 ```
 
-后续业务模块按实际需要增加 `service.go`、业务类型和窄 Repository 接口，再增加 `http/`、`postgres/` 适配包。HTTP DTO、业务类型与数据库实体分别维护；业务根包不导入 Gin 或 GORM，具体适配器由 app 装配。当前有 `internal/user/postgres/model.go` 的 `AdminUser` 和 `internal/member/postgres/model.go` 的 `MemberUser` 持久化实体；尚无 Service、Repository 或 HTTP 业务实现。
+后续业务模块按实际需要增加 `service.go`、业务类型和窄 Repository 接口，再增加 `http/`、`postgres/` 适配包。HTTP DTO、业务类型与数据库实体分别维护；业务根包不导入 Gin 或 GORM，具体适配器由 app 装配。当前有 `internal/adminuser/postgres/model.go` 的 `AdminUser` 和 `internal/member/postgres/model.go` 的 `MemberUser` 持久化实体；尚无 Service、Repository 或 HTTP 业务实现。
 
 用户实体分别映射 `admin_user`、`member_user`，可空字段使用指针，密码哈希不参与 JSON 序列化，创建字段限制为插入时写入，更新时间由后续 Repository 显式维护。会员实体保留完整参考字段并补充 username；生日为 date，标签 ID 使用 GORM JSON 序列化映射 jsonb，积分和经验使用 int64。会员字段预留不代表已实现会员登录、积分、等级或标签管理。字段与后续约束见[业务规划](../../docs/业务规划_2026-10-21.md)。实体标签不创建数据库约束；建表、唯一性、外键及索引须通过 goose SQL 落实，禁止调用 AutoMigrate。当前没有迁移 SQL，也未创建用户表。
 
