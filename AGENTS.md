@@ -4,11 +4,11 @@
 
 本项目名为 `template`，用于沉淀可复用的 Web 管理后台基础工程，降低未来项目的初始化和重复开发成本。
 
-- `backend-template/`：后端模板区域，`java/` 已建立 Maven 多模块基础骨架，`go/` 尚未创建；后续分别承载业务接口、身份认证、权限校验、数据访问和必要的审计能力。
+- `backend-template/`：后端模板区域，`java/` 已建立 Maven 多模块骨架，`go/` 已建立单 module 工程骨架；后续分别承载业务接口、身份认证、权限校验、数据访问和必要的审计能力。
 - `frontend-template/`：管理端前端模板，负责页面布局、路由导航、接口交互和通用管理页面。
 - Java、Go 是供不同派生项目选择的两套后端模板，每个派生项目选择其中一套并配合前端使用；不设计同一项目内的双后端部署或运行时切换。模板之间复用接口契约、前端代码与验收场景。
 - `docs/`：技术栈规划、设计和其他项目文档，入口见 [文档索引](docs/文档索引_2026-10-20.md)。
-- 前端已初始化空白工程骨架，Java 后端已建立启动与默认拒绝的安全骨架；均无业务功能，Go 后端尚未初始化。运行与检查方式见 [前端 README](frontend-template/README.md)、[Java 后端 README](backend-template/java/README.md)。
+- 前端已有空白工程，Java、Go 后端均有启动、健康检查与默认拒绝骨架；Go 已接入配置、日志、PostgreSQL 连接池、迁移命令及基础验证，均无业务功能。运行与检查方式见 [前端 README](frontend-template/README.md)、[Java 后端 README](backend-template/java/README.md)、[Go 后端 README](backend-template/go/README.md)。
 
 ## 技术栈
 
@@ -18,11 +18,11 @@
 - 前端质量工具：ESLint、Prettier、vue-tsc、Vitest、Vue Test Utils、Playwright；基础配置与依赖版本已记录，openapi-typescript 已安装，待共同契约建立后生成类型。当前没有业务测试或 Token 实现。
 - Java 基线：JDK 21、Maven Wrapper 3.10.0、Spring Boot 4.1.1、Spring Cloud 2025.1.3 BOM；版本按官方兼容关系配套，Cloud 目前仅导入 BOM，尚未启用具体组件。前端版本记录于其 package.json 和锁文件。
 - Java 使用 `template-common`、`template-framework`、`template-app` 三个构建模块，仅 app 可启动；已引入 MVC、Validation、Spring Security、Actuator、默认日志与测试依赖，功能包仅预留边界。
-- Go、Gin 的版本及配套组件待定；Java 与 Go 的数据访问、迁移、鉴权和日志实现分别评估，不能把 Java 组件直接视为 Go 选型。
-- 主数据库统一使用 PostgreSQL，具体版本待定。Java 已确定 MyBatis-Plus + Flyway，已补齐 Boot 4 starter、分页插件、PostgreSQL JDBC 与迁移支持依赖及数据源配置；正常启动须配置数据库，尚无业务表、迁移 SQL 或持久化业务。Go 数据访问与迁移工具、两套后端脚本复用边界仍待定。
+- Go 骨架固定 Go 1.27.3、Gin 1.12.0、GORM 1.31.2、PostgreSQL 驱动 1.6.3、goose 3.29.0；采用 Go Modules、手动依赖注入、类型化配置与环境变量、slog、testing + httptest。已提供工程检查脚本与 Go CI，尚无业务功能，版本以 go.mod、go.sum、.go-version 为准。
+- 主数据库统一使用 PostgreSQL，生产版本基线待定。Java 已接入 MyBatis-Plus + Flyway 依赖与配置；Go 已接入 GORM 连接池、goose 显式迁移命令和事务回调，已用 PostgreSQL 18.6 验证基础集成。两套后端均无业务表或业务迁移 SQL，脚本复用边界待定。正常启动须配置数据库，事务由业务层控制，结构变更走版本化 SQL。
 - Spring Cloud 仅适用于 Java 后端，其具体组件、服务边界及部署拓扑待定，依据实际需求设计，避免仅因采用 Spring Cloud 就引入整套基础设施。
-- 鉴权当前按 Token 方向规划，暂不采用 Cookie 承载认证凭据；Token 类型、传递方式、前端存储、有效期、刷新与撤销机制及具体组件仍待确定，不默认采用 JWT。
-- Go 构建及依赖管理方案、PostgreSQL 具体版本与配套工具、Token 鉴权细节仍待细化；Java 使用 Spring Security 仅建立安全骨架，不代表 Token 已实现。业务配套与部署配置仍待实现，不得将待定项写成已确定或已实现。
+- 两套后端通过 Authorization: Bearer 传递 Token，暂不采用 Cookie 承载认证凭据；Go 已选随机不透明 Token + PostgreSQL 会话记录（仅存 Token 哈希）、Argon2id、RBAC 关系表与统一授权中间件，每次请求查询会话、账号状态和最新权限，首期不引入 Casbin 或 Redis。Java Token 类型与组件、前端存储、有效期、刷新、多端及并发细则仍待确定。
+- PostgreSQL 生产版本、共同契约、Token 生命周期与部署参数仍待细化；Go 登录与权限方案尚未实现，Java Spring Security 也仅有安全骨架。业务配套与部署配置仍待实现，不得将待定项写成已确定或已实现。
 - 详细规划见 [技术栈规划](docs/技术栈规划_2026-10-19.md)。
 
 ## 文档规范

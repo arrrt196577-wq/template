@@ -11,17 +11,19 @@
 
 ## 当前状态
 
-项目处于初始化阶段，已建立前端与 Java 后端基础骨架：
+项目处于初始化阶段，已建立前端、Java 与 Go 后端基础骨架：
 
 - `frontend-template/` 已初始化空白 Vue 应用，接入路由、Pinia、Element Plus 中文配置、基础样式及 Axios 入口；没有实际页面或业务功能。
-- `backend-template/java/` 已建立 common、framework、app 三个 Maven 模块，提供启动入口、基础依赖、健康检查和默认拒绝的安全配置，无实际业务代码；Go 后端尚未初始化。
+- `backend-template/java/` 已建立 common、framework、app 三个 Maven 模块，提供启动入口、基础依赖、健康检查和默认拒绝的安全配置，无实际业务代码。
+- `backend-template/go/` 已建立 cmd、app、platform 与业务包边界，接入配置、JSON 日志、PostgreSQL 连接池、HTTP 生命周期、健康检查、迁移命令、基础测试和 Go CI，无实际业务代码。
 - 后端分别采用 Java + Spring Boot + Spring Cloud、Go + Gin；前端采用 Vue 3、TypeScript、Element Plus。
 - 前端工程采用 Node.js 24 LTS、create-vue + Vite、pnpm、Vue Router、Pinia、Axios、CSS Variables + scoped SCSS；已配置 ESLint、Prettier、vue-tsc、Vitest、Vue Test Utils、Playwright。依赖版本记录于前端 package.json 和锁文件；openapi-typescript 已安装，待共同契约建立后生成类型。
 - 每个派生项目选择 Java 或 Go 其中一套后端，配合前端模板使用；两套后端在模板层面复用接口契约、前端代码与验收要求，不涉及同一项目内的双后端部署或运行时切换。
-- 鉴权当前按 Token 方向规划，暂不采用 Cookie 承载认证凭据；Token 类型、传递、存储、刷新与撤销细节待定，不默认采用 JWT。
-- 主数据库统一使用 PostgreSQL，具体版本待定；Java 已确定 MyBatis-Plus + Flyway，已补齐依赖、分页插件和数据源配置，正常启动须配置数据库，但业务表、迁移 SQL 与持久化业务尚未实现。Go 数据访问与迁移工具仍待定。
-- Java 基线为 JDK 21、Maven Wrapper 3.10.0、Spring Boot 4.1.1、Spring Cloud 2025.1.3 BOM；Cloud 具体组件、Go 配套、PostgreSQL 版本与配套工具、Token 细节和部署方式仍待细化。
-- 安装、启动、构建及检查命令见 [前端 README](frontend-template/README.md)与 [Java 后端 README](backend-template/java/README.md)；当前尚无前后端业务接口联调和 Token 鉴权。
+- 两套后端通过 Authorization: Bearer 传递 Token，暂不采用 Cookie 承载认证凭据；Go 已选随机不透明 Token + PostgreSQL 会话记录、Argon2id 与 RBAC 中间件，尚未实现。Java Token 类型与组件、前端存储、有效期、刷新和多端登录细则仍待定。
+- 主数据库统一使用 PostgreSQL，生产版本基线待定；Java 已接入 MyBatis-Plus + Flyway 依赖与配置，Go 已接入 GORM + goose 和基础事务，正常启动均须配置数据库。两套后端均无业务表、业务迁移 SQL 或持久化业务；Go 基础集成已用 PostgreSQL 18.6 验证。
+- Go 固定 Go 1.27.3、Gin 1.12.0、GORM 1.31.2、PostgreSQL 驱动 1.6.3、goose 3.29.0；采用 Go Modules、单应用与手动依赖注入、类型化配置与环境变量、slog、testing + httptest。Gin 自带 validator 已作为依赖引入，尚无业务校验规则。
+- Java 基线为 JDK 21、Maven Wrapper 3.10.0、Spring Boot 4.1.1、Spring Cloud 2025.1.3 BOM；Cloud 具体组件、PostgreSQL 生产版本、Token 生命周期参数和部署方式仍待细化。
+- 安装、启动、构建及检查命令见 [前端 README](frontend-template/README.md)、[Java 后端 README](backend-template/java/README.md)、[Go 后端 README](backend-template/go/README.md)；当前尚无前后端业务接口联调和 Token 鉴权。
 
 ## 技术栈规划
 
@@ -41,7 +43,7 @@
 template/
 ├── AGENTS.md          # 项目边界、开发约定与 AI 协作要求
 ├── README.md          # 项目目标、目录职责与实施范围
-├── backend-template/  # java/ 已建立基础骨架，go/ 尚未创建
+├── backend-template/  # java/、go/ 已建立基础骨架，均无业务功能
 ├── frontend-template/ # 管理端前端模板
 └── docs/              # 按主题和日期命名的项目文档
 ```
@@ -50,7 +52,7 @@ template/
 
 ### backend-template
 
-`backend-template/java/` 已建立 Java + Spring Boot 基础骨架及 Spring Cloud BOM 版本管理；规划中的 `backend-template/go/` 使用 Go + Gin，尚未创建。
+`backend-template/java/` 已建立 Java + Spring Boot 基础骨架及 Spring Cloud BOM 版本管理；`backend-template/go/` 已建立 Go + Gin 工程骨架与运行、迁移及验证入口。
 
 两套后端均提供服务端接口与数据处理能力，负责身份认证、会话管理、接口权限及数据访问范围校验，统一处理参数校验、异常、分页和关键操作审计。它们是供派生项目选择的两种完整实现，不按语言拆分业务职责。
 
