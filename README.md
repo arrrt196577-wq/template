@@ -19,7 +19,8 @@
 - 前端工程采用 Node.js 24 LTS、create-vue + Vite、pnpm、Vue Router、Pinia、Axios、CSS Variables + scoped SCSS；已配置 ESLint、Prettier、vue-tsc、Vitest、Vue Test Utils、Playwright。依赖版本记录于前端 package.json 和锁文件；openapi-typescript 已安装，待共同契约建立后生成类型。
 - 每个派生项目选择 Java 或 Go 其中一套后端，配合前端模板使用；两套后端在模板层面复用接口契约、前端代码与验收要求，不涉及同一项目内的双后端部署或运行时切换。
 - 鉴权当前按 Token 方向规划，暂不采用 Cookie 承载认证凭据；Token 类型、传递、存储、刷新与撤销细节待定，不默认采用 JWT。
-- Java 基线为 JDK 21、Maven Wrapper 3.10.0、Spring Boot 4.1.1、Spring Cloud 2025.1.3 BOM；Cloud 具体组件、Go 配套、数据库、Token 细节和部署方式仍待细化。
+- 主数据库统一使用 PostgreSQL，具体版本待定；Java 已确定 MyBatis-Plus + Flyway，已补齐依赖、分页插件和数据源配置，正常启动须配置数据库，但业务表、迁移 SQL 与持久化业务尚未实现。Go 数据访问与迁移工具仍待定。
+- Java 基线为 JDK 21、Maven Wrapper 3.10.0、Spring Boot 4.1.1、Spring Cloud 2025.1.3 BOM；Cloud 具体组件、Go 配套、PostgreSQL 版本与配套工具、Token 细节和部署方式仍待细化。
 - 安装、启动、构建及检查命令见 [前端 README](frontend-template/README.md)与 [Java 后端 README](backend-template/java/README.md)；当前尚无前后端业务接口联调和 Token 鉴权。
 
 ## 技术栈规划

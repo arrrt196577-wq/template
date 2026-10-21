@@ -19,9 +19,10 @@
 - Java 基线：JDK 21、Maven Wrapper 3.10.0、Spring Boot 4.1.1、Spring Cloud 2025.1.3 BOM；版本按官方兼容关系配套，Cloud 目前仅导入 BOM，尚未启用具体组件。前端版本记录于其 package.json 和锁文件。
 - Java 使用 `template-common`、`template-framework`、`template-app` 三个构建模块，仅 app 可启动；已引入 MVC、Validation、Spring Security、Actuator、默认日志与测试依赖，功能包仅预留边界。
 - Go、Gin 的版本及配套组件待定；Java 与 Go 的数据访问、迁移、鉴权和日志实现分别评估，不能把 Java 组件直接视为 Go 选型。
+- 主数据库统一使用 PostgreSQL，具体版本待定。Java 已确定 MyBatis-Plus + Flyway，已补齐 Boot 4 starter、分页插件、PostgreSQL JDBC 与迁移支持依赖及数据源配置；正常启动须配置数据库，尚无业务表、迁移 SQL 或持久化业务。Go 数据访问与迁移工具、两套后端脚本复用边界仍待定。
 - Spring Cloud 仅适用于 Java 后端，其具体组件、服务边界及部署拓扑待定，依据实际需求设计，避免仅因采用 Spring Cloud 就引入整套基础设施。
 - 鉴权当前按 Token 方向规划，暂不采用 Cookie 承载认证凭据；Token 类型、传递方式、前端存储、有效期、刷新与撤销机制及具体组件仍待确定，不默认采用 JWT。
-- Go 构建及依赖管理方案、数据库、数据访问及迁移工具、Token 鉴权细节仍待细化；Java 使用 Spring Security 仅建立安全骨架，不代表 Token 已实现。业务配套与部署配置仍待实现，不得将待定项写成已确定或已实现。
+- Go 构建及依赖管理方案、PostgreSQL 具体版本与配套工具、Token 鉴权细节仍待细化；Java 使用 Spring Security 仅建立安全骨架，不代表 Token 已实现。业务配套与部署配置仍待实现，不得将待定项写成已确定或已实现。
 - 详细规划见 [技术栈规划](docs/技术栈规划_2026-10-19.md)。
 
 ## 文档规范
