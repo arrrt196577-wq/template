@@ -19,6 +19,7 @@ type AdminUser struct {
 	ID           int64   `gorm:"column:id;primaryKey;autoIncrement;<-:create"`
 	Username     string  `gorm:"column:username;type:varchar(64);not null"`
 	PasswordHash string  `gorm:"column:password_hash;type:text;not null" json:"-"`
+	AuthVersion  int64   `gorm:"column:auth_version;type:bigint;not null;default:1" json:"-"` // Increment with password changes in one transaction.
 	Nickname     string  `gorm:"column:nickname;type:varchar(64);not null"`
 	Remark       *string `gorm:"column:remark;type:varchar(500)"`
 	Email        *string `gorm:"column:email;type:varchar(254)"`

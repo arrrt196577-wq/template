@@ -20,7 +20,7 @@ func New(ctx context.Context, cfg config.Config, log *slog.Logger) (*App, error)
 	if err != nil {
 		return nil, err
 	}
-	handler, err := httpserver.NewHandler(cfg.HTTP, log, database.SQL.PingContext)
+	handler, err := newHTTPHandler(cfg.HTTP, log, database.SQL.PingContext)
 	if err != nil {
 		_ = database.Close()
 		return nil, err

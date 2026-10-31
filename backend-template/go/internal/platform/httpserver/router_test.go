@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"log/slog"
+	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
@@ -14,11 +15,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func newHealthHandler(cfg config.HTTP, log *slog.Logger, check Check) (http.Handler, error) {
+	router, err := NewRouter(cfg, log)
+	if err != nil {
+		return nil, err
+	}
+	RegisterHealthRoutes(router, cfg.HealthTimeout, check)
+	return router, nil
+}
+
 func TestHealthFailClosedAndLogRedaction(t *testing.T) {
 	var logs bytes.Buffer
 	log := slog.New(slog.NewJSONHandler(&logs, nil))
 	var unhealthy bool
-	handler, err := NewHandler(config.HTTP{HealthTimeout: time.Second}, log, func(context.Context) error {
+	handler, err := newHealthHandler(config.HTTP{HealthTimeout: time.Second}, log, func(context.Context) error {
 		if unhealthy {
 			return errors.New("internal database-secret")
 		}
@@ -57,7 +67,7 @@ func TestHealthFailClosedAndLogRedaction(t *testing.T) {
 
 func TestReadinessHonorsDeadlineAndRecoveryDoesNotExposePanic(t *testing.T) {
 	var logs bytes.Buffer
-	handler, err := NewHandler(config.HTTP{HealthTimeout: time.Millisecond}, slog.New(slog.NewJSONHandler(&logs, nil)), func(ctx context.Context) error {
+	handler, err := newHealthHandler(config.HTTP{HealthTimeout: time.Millisecond}, slog.New(slog.NewJSONHandler(&logs, nil)), func(ctx context.Context) error {
 		<-ctx.Done()
 		return ctx.Err()
 	})
@@ -78,7 +88,7 @@ func TestReadinessHonorsDeadlineAndRecoveryDoesNotExposePanic(t *testing.T) {
 }
 
 func TestCORSAndProxyTrust(t *testing.T) {
-	handler, err := NewHandler(config.HTTP{HealthTimeout: time.Second, CORSOrigins: []string{"https://admin.example.com"}}, slog.New(slog.NewJSONHandler(&bytes.Buffer{}, nil)), func(context.Context) error { return nil })
+	handler, err := newHealthHandler(config.HTTP{HealthTimeout: time.Second, CORSOrigins: []string{"https://admin.example.com"}}, slog.New(slog.NewJSONHandler(&bytes.Buffer{}, nil)), func(context.Context) error { return nil })
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -140,10 +140,11 @@ func TestEmptyMigrationAndDatabaseReadiness(t *testing.T) {
 	if err := pool.QueryRowContext(ctx, "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = current_schema()").Scan(&count); err != nil || count != 0 {
 		t.Fatal("empty migration unexpectedly changed the database schema")
 	}
-	handler, err := httpserver.NewHandler(config.HTTP{HealthTimeout: time.Second}, quiet(), pool.PingContext)
+	handler, err := httpserver.NewRouter(config.HTTP{HealthTimeout: time.Second}, quiet())
 	if err != nil {
 		t.Fatal(err)
 	}
+	httpserver.RegisterHealthRoutes(handler, time.Second, pool.PingContext)
 	response := httptest.NewRecorder()
 	handler.ServeHTTP(response, httptest.NewRequest("GET", "/health/ready", nil))
 	if response.Code != 200 {

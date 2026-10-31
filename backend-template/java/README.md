@@ -68,7 +68,7 @@ java/
 
 MyBatis-Plus 版本由父 POM 的 `mybatis-plus.version` 与 BOM 管理；其他基础依赖由 Boot 父 POM 管理，Cloud 相关版本由 `spring-cloud-dependencies` BOM 管理，不逐个指定 Spring 子组件版本。
 
-Java 已确定 PostgreSQL + MyBatis-Plus + Flyway，已提供依赖、数据源配置和分页拦截器；尚无业务表、迁移 SQL、Mapper 或持久化业务。PostgreSQL 服务端版本、Go 配套、Token 类型及存储仍待定。没有引入 JPA、Liquibase、Redis、JWT 或 OAuth Resource Server。
+Java 已确定 PostgreSQL + MyBatis-Plus + Flyway，已提供依赖、数据源配置和分页拦截器；尚无业务表、迁移 SQL、Mapper 或持久化业务。PostgreSQL 服务端版本待定。认证方向已明确为 JWT + Redis 登录有效记录，JWT 组件与密钥管理尚未确定或实现；会员多端独立登录，单次登出不影响其他登录。Redis 已纳入登录有效记录、缓存与共享限流的[技术栈规划](../../docs/技术栈规划.md)，版本与客户端待定，尚无依赖、连接配置或实现，当前启动无需 Redis。没有引入 JPA、Liquibase、JWT 或 OAuth Resource Server。
 
 正常启动必须提供 `DB_URL`、`DB_USERNAME`、`DB_PASSWORD`，数据库应事先创建且可连接，账号须具备迁移所需权限。没有默认用户名或密码；不要将真实凭据写入仓库。连接或迁移失败会阻止启动。
 
@@ -133,4 +133,4 @@ GET http://127.0.0.1:8080/actuator/health
 
 这些检查仅覆盖基础应用和当前安全骨架，不代表已经完成 Token 登录、RBAC、本人数据边界、管理员保护或业务验收。后续应先确定共同契约和数据方案，再在功能包内开发并增加对应测试。
 
-完整规划见 [技术栈规划](../../docs/技术栈规划_2026-10-19.md)、[业务规划](../../docs/业务规划_2026-10-21.md)及 [API 规划](../../docs/API规划_2026-10-20.md)。派生项目使用时记录模板来源提交与所选后端。
+完整规划见 [技术栈规划](../../docs/技术栈规划.md)、[业务规划](../../docs/业务规划.md)及 [API 规划](../../docs/API规划.md)。派生项目使用时记录模板来源提交与所选后端。

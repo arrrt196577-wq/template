@@ -19,7 +19,7 @@
 - 后端分别采用 Java + Spring Boot + Spring Cloud、Go + Gin；前端采用 Vue 3、TypeScript、Element Plus。
 - 前端工程采用 Node.js 24 LTS、create-vue + Vite、pnpm、Vue Router、Pinia、Axios、CSS Variables + scoped SCSS；已配置 ESLint、Prettier、vue-tsc、Vitest、Vue Test Utils、Playwright。依赖版本记录于前端 package.json 和锁文件；openapi-typescript 已安装，待共同契约建立后生成类型。
 - 每个派生项目选择 Java 或 Go 其中一套后端，配合前端模板使用；两套后端在模板层面复用接口契约、前端代码与验收要求，不涉及同一项目内的双后端部署或运行时切换。
-- 两套后端通过 Authorization: Bearer 传递 Token，暂不采用 Cookie 承载认证凭据；Go 已选随机不透明 Token + PostgreSQL 会话记录、Argon2id 与 RBAC 中间件，尚未实现。Java Token 类型与组件、前端存储、有效期、刷新和多端登录细则仍待定。
+- 两套后端通过 Authorization: Bearer 传递 Token，暂不采用 Cookie 承载认证凭据；认证采用 JWT + Redis 登录凭据有效记录方向，Go 密码使用 Argon2id，授权使用 RBAC，均尚未实现。会员支持多端独立登录，单次登出不影响其他登录；JWT 组件、前端存储、有效期、刷新及管理端多端策略仍待确定。
 - 主数据库统一使用 PostgreSQL，生产版本基线待定；Java 已接入 MyBatis-Plus + Flyway 依赖与配置，Go 已接入 GORM + goose 和基础事务，正常启动均须配置数据库。两套后端均无业务表、业务迁移 SQL 或持久化业务；Go 基础集成已用 PostgreSQL 18.6 验证。
 - Go 固定 Go 1.27.3、Gin 1.12.0、GORM 1.31.2、PostgreSQL 驱动 1.6.3、goose 3.29.0；采用 Go Modules、单应用与手动依赖注入、类型化配置与环境变量、slog、testing + httptest。Gin 自带 validator 已作为依赖引入，尚无业务校验规则。
 - Java 基线为 JDK 21、Maven Wrapper 3.10.0、Spring Boot 4.1.1、Spring Cloud 2025.1.3 BOM；Cloud 具体组件、PostgreSQL 生产版本、Token 生命周期参数和部署方式仍待细化。
@@ -27,15 +27,17 @@
 
 ## 技术栈规划
 
-项目文档入口见 [文档索引](docs/文档索引_2026-10-20.md)，可按任务查找相关规划与设计。
+项目文档入口见 [文档索引](docs/文档索引.md)，可按任务查找相关规划与设计。
 
-已确定选型、待定事项和实施顺序见 [技术栈规划](docs/技术栈规划_2026-10-19.md)。
+已确定选型、待定事项和实施顺序见 [技术栈规划](docs/技术栈规划.md)。
 
-接口契约、数据与错误格式、Token 鉴权边界和独立验收建议见 [API 规划](docs/API规划_2026-10-20.md)，具体格式、OpenAPI 版本及契约校验工具尚待确定，前端 HTTP 与类型生成工具已在技术栈规划中确定。
+接口契约、数据与错误格式、Token 鉴权边界和独立验收建议见 [API 规划](docs/API规划.md)，具体格式、OpenAPI 版本及契约校验工具尚待确定，前端 HTTP 与类型生成工具已在技术栈规划中确定。
 
-日志管理候选方案、对比与适用场景见 [日志管理方案对比](docs/日志管理方案对比_2026-10-19.md)，集中日志平台尚未确定。
+日志管理候选方案、对比与适用场景见 [日志管理方案对比](docs/日志管理方案对比.md)，集中日志平台尚未确定。
 
-后续新增项目文档统一放在 `docs/`，按 `xxxx_yyyy-mm-dd.md` 命名，具体规则见 [AGENTS.md](AGENTS.md)。
+数据库表清单、约束与索引、迁移顺序及建表前待定事项见 [数据库表规划](docs/数据库表规划.md)，当前尚无业务表或业务迁移 SQL。
+
+后续新增项目文档统一放在 `docs/`，按文档主题命名，文件名不加日期后缀，具体规则见 [AGENTS.md](AGENTS.md)。
 
 ## 目录结构
 
@@ -45,7 +47,7 @@ template/
 ├── README.md          # 项目目标、目录职责与实施范围
 ├── backend-template/  # java/、go/ 已建立基础骨架，均无业务功能
 ├── frontend-template/ # 管理端前端模板
-└── docs/              # 按主题和日期命名的项目文档
+└── docs/              # 按主题命名的项目文档
 ```
 
 ## 前后端职责
@@ -64,7 +66,7 @@ template/
 
 ## 第一阶段范围（规划）
 
-第一期功能清单、实现顺序与验收标准见 [业务规划](docs/业务规划_2026-10-21.md)。
+第一期功能清单、实现顺序与验收标准见 [业务规划](docs/业务规划.md)。
 
 1. 登录与会话管理，以及用户、角色和权限的基础能力。
 2. 一套前后端贯通的 CRUD 示例，覆盖列表、分页、筛选、表单校验和错误反馈。
@@ -75,7 +77,7 @@ template/
 
 ## 范围边界
 
-优先维护已经在实际项目中重复出现的基础能力。订单、支付、库存等具体业务由派生项目实现；多租户需求已明确，已建立[设计规划](docs/业务规划_2026-10-21.md)，隔离与身份方案待确认，运行能力尚未实现。工作流、插件系统、代码生成器和复杂数据权限按实际需求扩展。
+优先维护已经在实际项目中重复出现的基础能力。订单、支付、库存等具体业务由派生项目实现；多租户需求已明确，已建立[设计规划](docs/业务规划.md)，隔离与身份方案待确认，运行能力尚未实现。工作流、插件系统、代码生成器和复杂数据权限按实际需求扩展。
 
 模板是否有效，以后续项目能否减少初始化和重复开发工作为依据。
 

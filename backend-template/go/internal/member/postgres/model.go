@@ -21,6 +21,7 @@ type MemberUser struct {
 	Mobile           *string    `gorm:"column:mobile;type:varchar(32)"`
 	Email            *string    `gorm:"column:email;type:varchar(254)"`
 	PasswordHash     string     `gorm:"column:password_hash;type:text;not null" json:"-"`
+	AuthVersion      int64      `gorm:"column:auth_version;type:bigint;not null;default:1" json:"-"` // Increment with password changes in one transaction.
 	Status           string     `gorm:"column:status;type:varchar(16);not null;default:enabled"`
 	RegisterIP       *string    `gorm:"column:register_ip;type:inet;<-:create"`
 	RegisterTerminal *int32     `gorm:"column:register_terminal;type:integer;<-:create"`
