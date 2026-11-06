@@ -45,7 +45,7 @@ go/
 
 当前路由由 `internal/app/routes.go` 汇总：`httpserver.NewRouter` 配置 Gin 引擎、全局中间件及未注册请求默认拒绝，`RegisterHealthRoutes` 注册现有健康检查；`server.go` 负责 HTTP 生命周期，`middleware.go` 负责公共中间件。业务 HTTP 适配包在契约和 Service 落实后增加，不预建空 Handler 或注册占位业务接口。
 
-用户实体分别映射 `admin_user`、`member_user`，可空字段使用指针，密码哈希不参与 JSON 序列化，创建字段限制为插入时写入，更新时间由后续 Repository 显式维护。会员实体保留完整参考字段并补充 username；生日为 date，标签 ID 使用 GORM JSON 序列化映射 jsonb，积分和经验使用 int64。会员字段预留不代表已实现会员登录、积分、等级或标签管理。字段与后续约束见[业务规划](../../docs/业务规划.md)。实体标签不创建数据库约束；建表、唯一性、外键及索引须通过 goose SQL 落实，禁止调用 AutoMigrate。当前没有迁移 SQL，也未创建用户表。
+用户实体分别映射 `admin_user`、`member_user`，可空字段使用指针，密码哈希不参与 JSON 序列化，创建字段限制为插入时写入，更新时间由后续 Repository 显式维护。会员实体保留完整参考字段并补充 username；生日为 date，标签 ID 使用 GORM JSON 序列化映射 jsonb，积分和经验使用 int64。会员字段预留不代表已实现会员登录、积分、等级或标签管理。字段与后续约束见[用户管理](../../docs/业务/用户管理.md)和[会员管理](../../docs/业务/会员管理.md)。实体标签不创建数据库约束；建表、唯一性、外键及索引须通过 goose SQL 落实，禁止调用 AutoMigrate。当前没有迁移 SQL，也未创建用户表。
 
 两种实体已加入 `AuthVersion int64`，映射非空、默认 1 的 `auth_version`，并标记 `json:"-"`；标签仅描述映射，数据库正整数约束、改密同事务递增及认证版本比较尚未实现。
 
@@ -138,7 +138,7 @@ sh scripts/check.sh --integration --security
 
 ## 当前边界
 
-多租户已提前[规划](../../docs/业务规划.md)，当前两种用户实体均不含 tenant_id，没有租户上下文或查询隔离；共享库共享表、租户内账号和平台独立身份均为建议基线，尚未实施。
+多租户已提前[规划](../../docs/业务/多租户.md)，当前两种用户实体均不含 tenant_id，没有租户上下文或查询隔离；共享库共享表、租户内账号和平台独立身份均为建议基线，尚未实施。
 
 - 已提供工程与运维骨架及管理用户、会员持久化实体；不包含业务路由、DTO、Repository、业务表或业务迁移 SQL。
 - JWT + Redis 登录有效记录、Argon2id、RBAC、登录限流与审计仍是已确定但尚未实现的方案。会员支持多端独立登录，登出只撤销当前凭据。
